@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>form</title>
+</head>
+<body>
+
+<form id="registrationForm">
+    <h2>Create a new account</h2>
+    
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" name="name"><br>
+
+    <label for="address">Address:</label><br>
+    <input type="text" id="address" name="address"><br>
+
+    <label>Gender:</label>
+    <input type="radio" id="male" name="gender" value="male">Male       
+    <input type="radio" id="female" name="gender" value="female">Female    
+    <input type="radio" id="other" name="gender" value="other">Other      
+         
+    <label>Courses:</label>    
+    <input type="checkbox" id="wdpf" name="course" value="WDPF">WDPF   
+    <input type="checkbox" id="csharp" name="course" value="C#">C#     
+    <input type="checkbox" id="java" name="course" value="JAVA">JAVA
+
+    <label for="area">Area:</label>
+    <select id="area" name="area">
+        <option value="Saver">Saver</option>
+        <option value="Dhaka">Dhaka</option>
+        <option value="Comilla">Comilla</option>
+    </select>
+       
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email">
+    <div id="emailError" class="error"></div>  
+        
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <div id="passwordError" class="error"></div>  
+        
+    <label for="passwordConfirmation">Confirm Password:</label>
+    <input type="password" id="passwordConfirmation" name="passwordConfirmation">      
+        
+    <button type="button" onclick="registerUser()">Create Account</button>
+</form>
+   
+<script>      
+    class FormValidator {
+        constructor() {
+            this.errors = [];
+        }
+
+        validateEmail(email) {
+            const emailRegex = /\S+@\S+\.\S+/;
+            if (!emailRegex.test(email)) {
+                this.errors.push("Invalid email ");
+            }
+        }
+
+        validatePassword(password, passwordConfirmation) {
+            if (password.length < 8) {
+                this.errors.push("Password must be 8 characters long");
+            }   
+            if (!/[a-zA-Z]/.test(password)) {
+                this.errors.push("Password must contain one character");
+            }
+            if (!/\d/.test(password)) {
+                this.errors.push("Password must contain a number");
+            }
+            if (password !== passwordConfirmation) {
+                this.errors.push("Password and confirmation do not match");
+            }
+        } 
+
+        openDynamicWindow(userData) {
+            const dynamicWindow = window.open('', ' ', 'width=400,height=400');
+            dynamicWindow.document.write(`<h2>Registration Details</h2>
+            <p><strong>Name:</strong> ${userData.name}</p>
+            <p><strong>Address:</strong> ${userData.address}</p>
+            <p><strong>Gender:</strong> ${userData.gender}</p>
+            <p><strong>Area:</strong> ${userData.area}</p>
+            <p><strong>Course:</strong> ${userData.courses.join(", ")}</p>
+            <p><strong>Email:</strong> ${userData.email}</p>`);
+        }
+    }  
+
+    class User extends FormValidator {
+        constructor(name, address, gender, courses, area, email, password, passwordConfirmation) {
+            super();
+            this.name = name;
+            this.address = address;
+            this.gender = gender;
+            this.courses = courses;
+            this.area = area;
+            this.email = email;
+            this.password = password;
+            this.passwordConfirmation = passwordConfirmation;
+        }     
+
+        registerUser() {
+            this.errors = [];
+            this.validateEmail(this.email);
+            this.validatePassword(this.password, this.passwordConfirmation);
+
+            const emailError = document.getElementById("emailError");
+            const passwordError = document.getElementById("passwordError");
+
+            emailError.innerHTML = this.errors.find(error => error.includes("email")) || "";
+            passwordError.innerHTML = this.errors.find(error => error.includes("Password")) || "";
+
+            if (this.errors.length === 0) {
+                alert("User registration successful");
+                this.openDynamicWindow(this);
+            } else {
+                const errorMessages = document.getElementById("errorMessages");
+                errorMessages.innerHTML = this.errors.join("<br>");
+            }
+        }
+    }  
+
+    function registerUser() {
+        const name = document.getElementById("name").value;
+        const address = document.getElementById("address").value;
+        const gender = document.querySelector('input[name="gender"]:checked').value;
+
+        const courseCheckboxes = document.querySelectorAll('input[name="course"]:checked');
+        const courses = Array.from(courseCheckboxes).map(checkbox => checkbox.value);
+
+        const area = document.getElementById("area").value; // Fetching the value of the selected area.
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const passwordConfirmation = document.getElementById("passwordConfirmation").value;
+
+        const user = new User(name, address, gender, courses, area, email, password, passwordConfirmation);
+        user.registerUser();
+    }
+</script>
+</body>
+</html> 
